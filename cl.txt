@@ -1,0 +1,14 @@
+Que tal, Busco UN DESARROLLADOR O EQUIPO DE DESARROLLO par un PROYECTO (Laravel / PHP / MySQL)
+Sistema de gestión de clases deportivas, si ya existe o pueden desarrollar (MANDAN EL DEMO)
+El proyecto incluye:
+✅ Portal web para clientes.
+✅ Reservación de clases.
+✅ Control automático de cupos por CLASE (10 CUPOS).
+✅ Membresías mensuales.
+✅ Carga de comprobantes de pago.
+✅ Generación de recibos.
+✅ Panel administrativo completo.
+✅ Reportes y estadísticas.
+✅ Notificaciones mediante API de WhatsApp.
+✅ Sistema escalable para futuras disciplinas (gimnasio, yoga, natación, etc.).
+Si cuentas con un sistema similar o puedes desarrollarlo, envíame un mensaje privado.
