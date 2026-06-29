@@ -1,0 +1,108 @@
+<div class="page-header">
+  <h1>Mis Pagos 💳</h1>
+  <p>Historial de pagos y recibos</p>
+</div>
+
+@if (pagos().length === 0) {
+  <div class="empty-state">
+    <div class="empty-icon">💳</div>
+    <h3>Sin pagos registrados</h3>
+    <p>Cuando adquieras una membresía, tus pagos aparecerán aquí</p>
+  </div>
+} @else {
+  <div class="card" style="padding:0; overflow:hidden">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Concepto</th>
+          <th>Método</th>
+          <th>Fecha</th>
+          <th>Monto</th>
+          <th>Estado</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (pago of pagos(); track pago.id) {
+          <tr>
+            <td>
+              <strong>{{ pago.concepto }}</strong>
+              <div style="font-size:12px; color:#718096">{{ pago.tipo === 'membresia' ? 'Membresía' : 'Clase' }}</div>
+            </td>
+            <td>{{ getMetodoLabel(pago.metodoPago) }}</td>
+            <td>{{ formatFecha(pago.fechaPago) }}</td>
+            <td><strong style="color:#6c63ff">${{ pago.monto | number }}</strong></td>
+            <td><span class="badge" [class]="getBadgeClass(pago.estado)">{{ pago.estado }}</span></td>
+            <td>
+              @if (pago.estado === 'verificado') {
+                <button class="btn btn-outline btn-sm" (click)="verRecibo(pago)">
+                  🧾 Recibo
+                </button>
+              } @else if (pago.estado === 'pendiente') {
+                <span style="font-size:12px; color:#718096">En revisión...</span>
+              } @else {
+                <span style="font-size:12px; color:#ff4757">Rechazado</span>
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+}
+
+<!-- Modal Recibo -->
+@if (reciboVisible()) {
+  <div class="modal-overlay" (click)="cerrarRecibo()">
+    <div class="modal recibo-modal" (click)="$event.stopPropagation()">
+      <div class="recibo-header">
+        <div class="recibo-logo">
+          <span>💪</span>
+          <strong>ClasesDeportivas</strong>
+        </div>
+        <div>
+          <h2>RECIBO DE PAGO</h2>
+          <p class="recibo-num">{{ reciboVisible()!.numero }}</p>
+        </div>
+      </div>
+
+      <div class="recibo-info">
+        <div class="info-col">
+          <p class="label">Fecha</p>
+          <p>{{ formatFecha(reciboVisible()!.fecha) }}</p>
+        </div>
+        <div class="info-col">
+          <p class="label">Cliente</p>
+          <p>{{ reciboVisible()!.usuarioNombre }}</p>
+          <p class="email">{{ reciboVisible()!.usuarioEmail }}</p>
+        </div>
+      </div>
+
+      <table class="recibo-table">
+        <thead>
+          <tr><th>Concepto</th><th>Método de pago</th><th>Importe</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>{{ reciboVisible()!.concepto }}</td>
+            <td>{{ getMetodoLabel(reciboVisible()!.metodoPago) }}</td>
+            <td><strong>${{ reciboVisible()!.monto | number }}</strong></td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr>
+            <td colspan="2"><strong>TOTAL</strong></td>
+            <td><strong style="color:#6c63ff; font-size:18px">${{ reciboVisible()!.monto | number }} MXN</strong></td>
+          </tr>
+        </tfoot>
+      </table>
+
+      <p class="recibo-footer">Gracias por tu pago. Este documento es tu comprobante oficial.</p>
+
+      <div class="modal-footer">
+        <button class="btn btn-outline" (click)="cerrarRecibo()">Cerrar</button>
+        <button class="btn btn-primary" (click)="imprimirRecibo()">🖨️ Imprimir</button>
+      </div>
+    </div>
+  </div>
+}

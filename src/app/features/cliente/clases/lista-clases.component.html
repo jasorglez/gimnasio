@@ -1,0 +1,153 @@
+<div class="page-header">
+  <h1>Clases disponibles 🏋️</h1>
+  <p>Elige tu clase y reserva tu lugar</p>
+</div>
+
+<div class="filtros">
+  <input
+    class="form-control search"
+    placeholder="🔍 Buscar clase o instructor..."
+    [ngModel]="busqueda()"
+    (ngModelChange)="busqueda.set($event)"
+  />
+  <select class="form-control" [ngModel]="filtroDia()" (ngModelChange)="filtroDia.set($event)">
+    <option value="">Todos los días</option>
+    @for (dia of dias; track dia) {
+      <option [value]="dia">{{ dia | titlecase }}</option>
+    }
+  </select>
+  <select class="form-control" [ngModel]="filtroDisciplina()" (ngModelChange)="filtroDisciplina.set($event)">
+    <option value="">Todas las disciplinas</option>
+    @for (d of disciplinas; track d.value) {
+      <option [value]="d.value">{{ d.label }}</option>
+    }
+  </select>
+</div>
+
+@if (clases().length === 0) {
+  <div class="empty-state">
+    <div class="empty-icon">🔍</div>
+    <h3>Sin resultados</h3>
+    <p>No se encontraron clases con esos filtros</p>
+    <button class="btn btn-outline" (click)="filtroDia.set(''); filtroDisciplina.set(''); busqueda.set('')">
+      Limpiar filtros
+    </button>
+  </div>
+}
+
+<div class="clases-grid">
+  @for (clase of clases(); track clase.id) {
+    <div class="clase-card" [class.sin-cupos]="clase.cuposDisponibles === 0">
+      <div class="clase-header" [style.background]="clase.color">
+        <span class="clase-emoji">{{ clase.emoji }}</span>
+        <div class="header-info">
+          <h3>{{ clase.nombre }}</h3>
+          <span class="disciplina-tag">{{ clase.disciplina }}</span>
+        </div>
+      </div>
+      <div class="clase-body">
+        <p class="descripcion">{{ clase.descripcion }}</p>
+        <div class="meta">
+          <div class="meta-item">
+            <span class="meta-icon">👨‍🏫</span>
+            <span>{{ clase.instructor }}</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-icon">📅</span>
+            <span>{{ formatDias(clase.diasSemana) }}</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-icon">🕐</span>
+            <span>{{ clase.horaInicio }} – {{ clase.horaFin }}</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-icon">💰</span>
+            <span>${{ clase.precio }}/clase</span>
+          </div>
+        </div>
+        <div class="cupos-row">
+          <span [class]="'cupos-badge ' + getCuposClass(clase)">
+            @if (clase.cuposDisponibles === 0) {
+              🔴 Sin cupos
+            } @else {
+              🟢 {{ clase.cuposDisponibles }} de {{ clase.cuposTotal }} cupos disponibles
+            }
+          </span>
+        </div>
+        <div class="cupos-bar">
+          <div
+            class="cupos-fill"
+            [style.width.%]="((clase.cuposTotal - clase.cuposDisponibles) / clase.cuposTotal) * 100"
+            [style.background]="clase.color"
+          ></div>
+        </div>
+      </div>
+      <div class="clase-footer">
+        <button
+          class="btn btn-primary w-100"
+          [disabled]="clase.cuposDisponibles === 0"
+          (click)="abrirModal(clase)"
+        >
+          @if (clase.cuposDisponibles === 0) {
+            Sin cupos disponibles
+          } @else {
+            Reservar lugar →
+          }
+        </button>
+      </div>
+    </div>
+  }
+</div>
+
+<!-- Modal de reservación -->
+@if (modalClase()) {
+  <div class="modal-overlay" (click)="cerrarModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>{{ modalClase()!.emoji }} {{ modalClase()!.nombre }}</h2>
+        <button class="btn btn-ghost btn-icon" (click)="cerrarModal()">✕</button>
+      </div>
+
+      @if (mensajeExito()) {
+        <div class="alert alert-success">✅ {{ mensajeExito() }}</div>
+      }
+      @if (mensajeError()) {
+        <div class="alert alert-danger">❌ {{ mensajeError() }}</div>
+      }
+
+      <div class="modal-info">
+        <div class="modal-meta">
+          <span>👨‍🏫 {{ modalClase()!.instructor }}</span>
+          <span>🕐 {{ modalClase()!.horaInicio }} – {{ modalClase()!.horaFin }}</span>
+          <span>📅 {{ formatDias(modalClase()!.diasSemana) }}</span>
+          <span>💰 ${{ modalClase()!.precio }}</span>
+          <span [class]="'cupos-' + getCuposClass(modalClase()!)">
+            🎯 {{ modalClase()!.cuposDisponibles }} cupos disponibles
+          </span>
+        </div>
+      </div>
+
+      <div class="form-group" style="margin-top:16px">
+        <label>Selecciona la fecha</label>
+        <input
+          class="form-control"
+          type="date"
+          [ngModel]="fechaSeleccionada()"
+          (ngModelChange)="fechaSeleccionada.set($event)"
+          [min]="proximaFecha(modalClase()!.diasSemana[0])"
+        />
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-outline" (click)="cerrarModal()">Cancelar</button>
+        <button
+          class="btn btn-primary"
+          (click)="reservar()"
+          [disabled]="!fechaSeleccionada() || reservandoId() !== ''"
+        >
+          @if (reservandoId()) { Reservando... } @else { Confirmar reservación }
+        </button>
+      </div>
+    </div>
+  </div>
+}

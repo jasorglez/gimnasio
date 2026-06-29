@@ -1,0 +1,135 @@
+<div class="page-header">
+  <h1>¡Hola, {{ usuario()?.nombre }}! 👋</h1>
+  <p>Aquí está el resumen de tu actividad</p>
+</div>
+
+<div class="dashboard-grid">
+  <!-- Membresía -->
+  <div class="card membresia-card">
+    @if (membresia()) {
+      <div class="membresia-header">
+        <div>
+          <div class="badge badge-success">Membresía Activa</div>
+          <h3>{{ membresia()!.plan.nombre }}</h3>
+        </div>
+        <span class="plan-emoji">⭐</span>
+      </div>
+      <div class="membresia-info">
+        <div class="info-item">
+          <span class="label">Vence</span>
+          <strong>{{ membresia()!.fechaVencimiento | date:'dd/MM/yyyy' }}</strong>
+        </div>
+        <div class="info-item">
+          <span class="label">Días restantes</span>
+          <strong [class.text-danger]="diasRestantes() < 7">{{ diasRestantes() }} días</strong>
+        </div>
+        <div class="info-item">
+          <span class="label">Clases usadas</span>
+          <strong>{{ membresia()!.clasesUsadas }}</strong>
+        </div>
+      </div>
+      <div class="progress-label">
+        <span>Tiempo transcurrido</span>
+        <span>{{ porcentajeMembresiaUsada() }}%</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" [style.width.%]="porcentajeMembresiaUsada()"></div>
+      </div>
+      <a routerLink="/cliente/membresia" class="btn btn-outline btn-sm" style="margin-top:16px">Ver membresía →</a>
+    } @else {
+      <div class="no-membresia">
+        <span class="no-icon">🔓</span>
+        <h3>Sin membresía activa</h3>
+        <p>Adquiere un plan para acceder a todas las clases sin límite.</p>
+        <a routerLink="/cliente/membresia" class="btn btn-primary">Ver planes →</a>
+      </div>
+    }
+  </div>
+
+  <!-- Stats rápidas -->
+  <div class="stats-col">
+    <div class="stat-card">
+      <div class="stat-icon" style="background: rgba(108,99,255,0.1)">📅</div>
+      <div class="stat-info">
+        <h3>{{ misReservaciones().length }}</h3>
+        <p>Reservaciones activas</p>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon" style="background: rgba(0,212,170,0.1)">🏋️</div>
+      <div class="stat-info">
+        <h3>{{ membresia()?.clasesUsadas ?? 0 }}</h3>
+        <p>Clases asistidas</p>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon" style="background: rgba(255,184,0,0.1)">⭐</div>
+      <div class="stat-info">
+        <h3>{{ diasRestantes() }}</h3>
+        <p>Días de membresía</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Próximas reservaciones -->
+<div class="section-header">
+  <h2>Próximas reservaciones</h2>
+  <a routerLink="/cliente/reservaciones" class="btn btn-ghost btn-sm">Ver todas →</a>
+</div>
+
+@if (misReservaciones().length === 0) {
+  <div class="empty-state">
+    <div class="empty-icon">📅</div>
+    <h3>Sin reservaciones</h3>
+    <p>¡Reserva tu primera clase ahora!</p>
+    <a routerLink="/cliente/clases" class="btn btn-primary">Ver clases →</a>
+  </div>
+} @else {
+  <div class="reservaciones-list">
+    @for (r of misReservaciones(); track r.id) {
+      @let clase = getClase(r.claseId);
+      @if (clase) {
+        <div class="reservacion-card">
+          <div class="clase-color-bar" [style.background]="clase.color"></div>
+          <div class="clase-emoji">{{ clase.emoji }}</div>
+          <div class="clase-info">
+            <h4>{{ clase.nombre }}</h4>
+            <p>{{ clase.instructor }} · {{ clase.horaInicio }}–{{ clase.horaFin }}</p>
+          </div>
+          <div class="reservacion-meta">
+            <span class="fecha">{{ formatFecha(r.fecha) }}</span>
+            <span class="badge" [class]="'badge-' + (r.estado === 'confirmada' ? 'success' : 'warning')">
+              {{ r.estado }}
+            </span>
+          </div>
+        </div>
+      }
+    }
+  </div>
+}
+
+<!-- Clases disponibles -->
+<div class="section-header" style="margin-top: 32px">
+  <h2>Clases disponibles</h2>
+  <a routerLink="/cliente/clases" class="btn btn-ghost btn-sm">Ver todas →</a>
+</div>
+
+<div class="clases-grid">
+  @for (clase of clasesActivas(); track clase.id) {
+    <div class="clase-card">
+      <div class="clase-card-header" [style.background]="clase.color">
+        <span class="clase-big-emoji">{{ clase.emoji }}</span>
+        <span class="cupos-badge" [class.danger]="clase.cuposDisponibles <= 2" [class.warning]="clase.cuposDisponibles <= 5 && clase.cuposDisponibles > 2">
+          {{ clase.cuposDisponibles }}/{{ clase.cuposTotal }} cupos
+        </span>
+      </div>
+      <div class="clase-card-body">
+        <h4>{{ clase.nombre }}</h4>
+        <p>{{ clase.instructor }}</p>
+        <p class="horario">🕐 {{ clase.horaInicio }}–{{ clase.horaFin }}</p>
+        <a routerLink="/cliente/clases" class="btn btn-outline btn-sm w-100" style="margin-top:10px; justify-content:center">Reservar</a>
+      </div>
+    </div>
+  }
+</div>

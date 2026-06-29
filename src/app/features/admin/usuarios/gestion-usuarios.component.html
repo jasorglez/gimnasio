@@ -1,0 +1,71 @@
+<div class="page-header">
+  <div>
+    <h1>Gestión de Usuarios 👥</h1>
+    <p>Administra los clientes registrados</p>
+  </div>
+  <input class="form-control" style="width:280px" placeholder="🔍 Buscar por nombre o email..."
+    [ngModel]="busqueda()" (ngModelChange)="busqueda.set($event)" />
+</div>
+
+@if (mensaje()) {
+  <div class="alert alert-success">{{ mensaje() }}</div>
+}
+
+<div class="usuarios-grid">
+  @for (usuario of usuarios(); track usuario.id) {
+    @let membresia = getMembresia(usuario.id);
+    <div class="usuario-card">
+      <div class="card-top">
+        <div class="avatar-circle">{{ iniciales(usuario.nombre, usuario.apellido) }}</div>
+        <div class="user-name">
+          <h3>{{ usuario.nombre }} {{ usuario.apellido }}</h3>
+          <p>{{ usuario.email }}</p>
+        </div>
+        <div class="status-toggle">
+          <span class="badge" [class]="usuario.activo ? 'badge-success' : 'badge-danger'">
+            {{ usuario.activo ? 'Activo' : 'Inactivo' }}
+          </span>
+        </div>
+      </div>
+
+      <div class="card-details">
+        <div class="detail-item">
+          <span>📱 Teléfono</span>
+          <strong>{{ usuario.telefono }}</strong>
+        </div>
+        <div class="detail-item">
+          <span>📅 Registro</span>
+          <strong>{{ formatFecha(usuario.fechaRegistro) }}</strong>
+        </div>
+        <div class="detail-item">
+          <span>📋 Reservaciones</span>
+          <strong>{{ getReservaciones(usuario.id) }}</strong>
+        </div>
+        <div class="detail-item">
+          <span>⭐ Membresía</span>
+          <strong>
+            @if (membresia) {
+              <span class="badge badge-success">{{ membresia.plan.nombre }}</span>
+            } @else {
+              <span class="badge badge-danger">Sin membresía</span>
+            }
+          </strong>
+        </div>
+      </div>
+
+      <div class="card-footer">
+        <button class="btn btn-sm" [class]="usuario.activo ? 'btn-danger' : 'btn-success'" (click)="toggleActivo(usuario.id)">
+          {{ usuario.activo ? '🔒 Desactivar' : '🔓 Activar' }}
+        </button>
+      </div>
+    </div>
+  }
+</div>
+
+@if (usuarios().length === 0) {
+  <div class="empty-state">
+    <div class="empty-icon">👥</div>
+    <h3>Sin usuarios</h3>
+    <p>No se encontraron clientes con esa búsqueda</p>
+  </div>
+}

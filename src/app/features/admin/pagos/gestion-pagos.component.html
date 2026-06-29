@@ -1,0 +1,113 @@
+<div class="page-header">
+  <div>
+    <h1>Gestión de Pagos 💳</h1>
+    <p>Verifica y gestiona los pagos recibidos</p>
+  </div>
+  <select class="form-control" style="width:180px" [ngModel]="filtroEstado()" (ngModelChange)="filtroEstado.set($event)">
+    <option value="">Todos los estados</option>
+    <option value="pendiente">⏳ Pendientes</option>
+    <option value="verificado">✅ Verificados</option>
+    <option value="rechazado">❌ Rechazados</option>
+  </select>
+</div>
+
+@if (mensaje()) {
+  <div class="alert alert-success">{{ mensaje() }}</div>
+}
+
+<div class="card" style="padding:0; overflow:hidden">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Cliente</th>
+        <th>Concepto</th>
+        <th>Método</th>
+        <th>Fecha</th>
+        <th>Monto</th>
+        <th>Estado</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (pago of pagos(); track pago.id) {
+        @let usuario = getUsuario(pago.usuarioId);
+        <tr>
+          <td>
+            <div class="user-cell">
+              <div class="avatar-sm">{{ usuario?.nombre?.[0] }}{{ usuario?.apellido?.[0] }}</div>
+              <div>
+                <strong>{{ usuario?.nombre }} {{ usuario?.apellido }}</strong>
+                <span>{{ usuario?.email }}</span>
+              </div>
+            </div>
+          </td>
+          <td>{{ pago.concepto }}</td>
+          <td>{{ getMetodoLabel(pago.metodoPago) }}</td>
+          <td>{{ formatFecha(pago.fechaPago) }}</td>
+          <td><strong style="color:#6c63ff">${{ pago.monto | number }}</strong></td>
+          <td><span class="badge" [class]="getBadgeClass(pago.estado)">{{ pago.estado }}</span></td>
+          <td>
+            <div class="actions">
+              <button class="btn btn-outline btn-sm" (click)="verDetalle(pago)">👁️ Detalle</button>
+              @if (pago.estado === 'pendiente') {
+                <button class="btn btn-success btn-sm" (click)="verificar(pago)">✅ Verificar</button>
+              }
+            </div>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>
+
+<!-- Modal detalle -->
+@if (pagoDetalle()) {
+  @let pago = pagoDetalle()!;
+  @let usuario = getUsuario(pago.usuarioId);
+  <div class="modal-overlay" (click)="cerrarDetalle()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Detalle de pago</h2>
+        <button class="btn btn-ghost btn-icon" (click)="cerrarDetalle()">✕</button>
+      </div>
+
+      <div class="detalle-grid">
+        <div class="detalle-row"><span>Cliente</span><strong>{{ usuario?.nombre }} {{ usuario?.apellido }}</strong></div>
+        <div class="detalle-row"><span>Email</span><strong>{{ usuario?.email }}</strong></div>
+        <div class="detalle-row"><span>Concepto</span><strong>{{ pago.concepto }}</strong></div>
+        <div class="detalle-row"><span>Monto</span><strong style="color:#6c63ff; font-size:18px">${{ pago.monto | number }}</strong></div>
+        <div class="detalle-row"><span>Método</span><strong>{{ getMetodoLabel(pago.metodoPago) }}</strong></div>
+        <div class="detalle-row"><span>Fecha</span><strong>{{ formatFecha(pago.fechaPago) }}</strong></div>
+        <div class="detalle-row"><span>Estado</span><span class="badge" [class]="getBadgeClass(pago.estado)">{{ pago.estado }}</span></div>
+        @if (pago.verificadoPor) {
+          <div class="detalle-row"><span>Verificado por</span><strong>{{ pago.verificadoPor }}</strong></div>
+        }
+        @if (pago.notas) {
+          <div class="detalle-row"><span>Notas</span><strong>{{ pago.notas }}</strong></div>
+        }
+      </div>
+
+      @if (pago.comprobante) {
+        <div class="comprobante-preview">
+          <h4>Comprobante adjunto</h4>
+          <img [src]="pago.comprobante" [alt]="pago.nombreArchivo" style="max-width:100%; border-radius:8px; margin-top:8px" />
+        </div>
+      }
+
+      @if (pago.estado === 'pendiente') {
+        <div class="form-group" style="margin-top:16px">
+          <label>Motivo de rechazo (si aplica)</label>
+          <textarea class="form-control" rows="2" [ngModel]="notasRechazo()" (ngModelChange)="notasRechazo.set($event)" placeholder="Escribe el motivo..."></textarea>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-danger" (click)="rechazar(pago)">❌ Rechazar</button>
+          <button class="btn btn-success" (click)="verificar(pago); cerrarDetalle()">✅ Verificar pago</button>
+        </div>
+      } @else {
+        <div class="modal-footer">
+          <button class="btn btn-outline" (click)="cerrarDetalle()">Cerrar</button>
+        </div>
+      }
+    </div>
+  </div>
+}

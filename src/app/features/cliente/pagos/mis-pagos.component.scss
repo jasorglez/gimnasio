@@ -1,0 +1,81 @@
+.recibo-modal {
+  max-width: 620px;
+
+  .recibo-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #e2e8f0;
+    margin-bottom: 20px;
+
+    .recibo-logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 22px;
+
+      strong { font-size: 16px; color: #1a1a2e; }
+    }
+
+    h2 { font-size: 20px; font-weight: 800; text-align: right; }
+    .recibo-num { color: #6c63ff; font-weight: 600; text-align: right; }
+  }
+
+  .recibo-info {
+    display: flex;
+    gap: 40px;
+    margin-bottom: 20px;
+
+    .info-col {
+      .label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: #a0aec0; margin-bottom: 4px; }
+      p { font-size: 14px; color: #1a1a2e; font-weight: 500; }
+      .email { color: #718096; font-size: 13px; }
+    }
+  }
+
+  .recibo-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 16px;
+
+    th {
+      background: #f7f8fc;
+      padding: 10px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #718096;
+      text-align: left;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    td {
+      padding: 14px;
+      font-size: 14px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    tfoot td {
+      border-top: 2px solid #e2e8f0;
+      border-bottom: none;
+      font-size: 15px;
+    }
+  }
+
+  .recibo-footer {
+    text-align: center;
+    font-size: 12px;
+    color: #a0aec0;
+    padding: 12px;
+    background: #f7f8fc;
+    border-radius: 8px;
+  }
+}
+
+@media print {
+  .modal-overlay { position: static; background: none; }
+  .modal { box-shadow: none; max-width: 100%; }
+  .modal-footer { display: none; }
+}

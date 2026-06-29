@@ -1,0 +1,139 @@
+<div class="page-header">
+  <h1>Dashboard 📊</h1>
+  <p>Resumen general del sistema</p>
+</div>
+
+<!-- Stats principales -->
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-icon" style="background:rgba(108,99,255,0.1)">👥</div>
+    <div class="stat-info">
+      <h3>{{ stats().clientes }}</h3>
+      <p>Clientes registrados</p>
+    </div>
+    <a routerLink="/admin/usuarios" class="stat-link">Ver →</a>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon" style="background:rgba(255,107,107,0.1)">🏋️</div>
+    <div class="stat-info">
+      <h3>{{ stats().clases }}</h3>
+      <p>Clases activas</p>
+    </div>
+    <a routerLink="/admin/clases" class="stat-link">Ver →</a>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon" style="background:rgba(0,212,170,0.1)">📅</div>
+    <div class="stat-info">
+      <h3>{{ stats().reservaciones }}</h3>
+      <p>Reservaciones activas</p>
+    </div>
+    <a routerLink="/admin/reservaciones" class="stat-link">Ver →</a>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon" style="background:rgba(255,184,0,0.1)">⭐</div>
+    <div class="stat-info">
+      <h3>{{ stats().membresiastActivas }}</h3>
+      <p>Membresías activas</p>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon" style="background:rgba(255,71,87,0.1)">⏳</div>
+    <div class="stat-info">
+      <h3>{{ stats().pagosPendientes }}</h3>
+      <p>Pagos por verificar</p>
+    </div>
+    <a routerLink="/admin/pagos" class="stat-link">Ver →</a>
+  </div>
+  <div class="stat-card accent">
+    <div class="stat-icon" style="background:rgba(255,255,255,0.2)">💰</div>
+    <div class="stat-info">
+      <h3>${{ stats().totalRecaudado | number }}</h3>
+      <p>Total recaudado</p>
+    </div>
+    <a routerLink="/admin/reportes" class="stat-link" style="color:white">Ver →</a>
+  </div>
+</div>
+
+<div class="dashboard-grid">
+  <!-- Pagos pendientes -->
+  <div class="card">
+    <div class="card-header">
+      <h3>⏳ Pagos pendientes</h3>
+      <a routerLink="/admin/pagos" class="btn btn-ghost btn-sm">Ver todos →</a>
+    </div>
+    @if (pagosPendientes().length === 0) {
+      <p class="empty-msg">Sin pagos pendientes ✅</p>
+    } @else {
+      @for (pago of pagosPendientes(); track pago.id) {
+        @let usuario = getUsuario(pago.usuarioId);
+        <div class="list-item">
+          <div class="avatar avatar-sm" style="background:#ff6b6b">
+            {{ usuario?.nombre?.[0] }}{{ usuario?.apellido?.[0] }}
+          </div>
+          <div class="list-info">
+            <strong>{{ usuario?.nombre }} {{ usuario?.apellido }}</strong>
+            <span>{{ pago.concepto }}</span>
+          </div>
+          <div class="list-right">
+            <strong style="color:#6c63ff">${{ pago.monto | number }}</strong>
+            <span class="badge badge-warning">pendiente</span>
+          </div>
+        </div>
+      }
+    }
+  </div>
+
+  <!-- Clases con menos cupos -->
+  <div class="card">
+    <div class="card-header">
+      <h3>🔥 Clases más demandadas</h3>
+      <a routerLink="/admin/clases" class="btn btn-ghost btn-sm">Ver todas →</a>
+    </div>
+    @for (clase of clasesConMenosCupos(); track clase.id) {
+      <div class="clase-row">
+        <div class="clase-emoji-small">{{ clase.emoji }}</div>
+        <div class="clase-row-info">
+          <strong>{{ clase.nombre }}</strong>
+          <span>{{ clase.instructor }}</span>
+        </div>
+        <div class="cupos-mini">
+          <span [class]="clase.cuposDisponibles <= 2 ? 'text-danger' : clase.cuposDisponibles <= 5 ? 'text-warning' : 'text-success'">
+            {{ clase.cuposDisponibles }}/{{ clase.cuposTotal }}
+          </span>
+          <div class="mini-bar">
+            <div
+              class="mini-fill"
+              [style.width.%]="((clase.cuposTotal - clase.cuposDisponibles) / clase.cuposTotal) * 100"
+              [style.background]="clase.color"
+            ></div>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+</div>
+
+<!-- Accesos rápidos -->
+<div class="quick-actions">
+  <h2>Acciones rápidas</h2>
+  <div class="actions-grid">
+    <a routerLink="/admin/clases" class="action-card">
+      <span>🏋️</span><p>Gestionar clases</p>
+    </a>
+    <a routerLink="/admin/pagos" class="action-card">
+      <span>💳</span><p>Verificar pagos</p>
+    </a>
+    <a routerLink="/admin/usuarios" class="action-card">
+      <span>👥</span><p>Ver usuarios</p>
+    </a>
+    <a routerLink="/admin/reportes" class="action-card">
+      <span>📈</span><p>Reportes</p>
+    </a>
+    <a routerLink="/admin/whatsapp" class="action-card">
+      <span>💬</span><p>WhatsApp log</p>
+    </a>
+    <a routerLink="/admin/reservaciones" class="action-card">
+      <span>📅</span><p>Reservaciones</p>
+    </a>
+  </div>
+</div>

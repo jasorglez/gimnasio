@@ -1,0 +1,52 @@
+<div class="layout" [class.sidebar-open]="sidebarOpen()">
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="logo">
+        <span class="logo-icon">💪</span>
+        <span>Admin Panel</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      @for (item of menu; track item.route) {
+        <a
+          class="nav-item"
+          [routerLink]="item.route"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: item.route === '/admin' }"
+          (click)="sidebarOpen.set(false)"
+        >
+          <span class="nav-icon">{{ item.icon }}</span>
+          <span>{{ item.label }}</span>
+        </a>
+      }
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-card">
+        <div class="avatar">{{ iniciales() }}</div>
+        <div class="user-info">
+          <strong>{{ usuario()?.nombre }}</strong>
+          <span class="badge-admin">Administrador</span>
+        </div>
+      </div>
+      <button class="btn-logout" (click)="logout()">🚪 Cerrar sesión</button>
+    </div>
+  </aside>
+
+  <div class="overlay" (click)="sidebarOpen.set(false)"></div>
+
+  <main class="main">
+    <header class="topbar">
+      <button class="menu-toggle" (click)="sidebarOpen.update(v => !v)">☰</button>
+      <div class="topbar-brand">Panel Administrativo</div>
+      <div class="topbar-right">
+        <div class="avatar avatar-sm">{{ iniciales() }}</div>
+        <span>{{ usuario()?.nombre }}</span>
+      </div>
+    </header>
+    <div class="content">
+      <router-outlet />
+    </div>
+  </main>
+</div>

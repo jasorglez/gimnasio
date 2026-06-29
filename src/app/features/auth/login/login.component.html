@@ -1,0 +1,75 @@
+<div class="auth-page">
+  <div class="auth-left">
+    <div class="brand">
+      <span class="logo-icon">💪</span>
+      <span class="logo-text">ClasesDeportivas</span>
+    </div>
+    <div class="hero-content">
+      <h1>Tu mejor versión<br><span>comienza aquí</span></h1>
+      <p>Reserva clases, gestiona tu membresía y alcanza tus metas deportivas desde un solo lugar.</p>
+      <div class="stats-row">
+        <div class="stat"><strong>+500</strong><span>Miembros activos</span></div>
+        <div class="stat"><strong>8+</strong><span>Disciplinas</span></div>
+        <div class="stat"><strong>10</strong><span>Cupos por clase</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="auth-right">
+    <div class="auth-box">
+      <h2>Iniciar sesión</h2>
+      <p class="subtitle">Bienvenido de vuelta 👋</p>
+
+      @if (error()) {
+        <div class="alert alert-danger">{{ error() }}</div>
+      }
+
+      <div class="form-group">
+        <label>Correo electrónico</label>
+        <input
+          class="form-control"
+          type="email"
+          placeholder="tu@email.com"
+          [ngModel]="email()"
+          (ngModelChange)="email.set($event)"
+        />
+      </div>
+
+      <div class="form-group" style="margin-top:16px">
+        <label>Contraseña</label>
+        <div class="input-with-icon">
+          <input
+            class="form-control"
+            [type]="mostrarPassword() ? 'text' : 'password'"
+            placeholder="••••••••"
+            [ngModel]="password()"
+            (ngModelChange)="password.set($event)"
+            (keyup.enter)="login()"
+          />
+          <button class="toggle-pass" (click)="mostrarPassword.update(v => !v)" type="button">
+            {{ mostrarPassword() ? '🙈' : '👁️' }}
+          </button>
+        </div>
+      </div>
+
+      <button class="btn btn-primary w-100 login-btn" (click)="login()" [disabled]="loading()">
+        @if (loading()) {
+          <span class="spinner-inline"></span> Ingresando...
+        } @else {
+          Ingresar →
+        }
+      </button>
+
+      <div class="divider"><span>o usa una cuenta demo</span></div>
+
+      <div class="demo-btns">
+        <button class="btn btn-outline" (click)="usarDemo('admin')">🔧 Demo Admin</button>
+        <button class="btn btn-outline" (click)="usarDemo('cliente')">👤 Demo Cliente</button>
+      </div>
+
+      <p class="register-link">
+        ¿No tienes cuenta? <a routerLink="/registro">Regístrate gratis</a>
+      </p>
+    </div>
+  </div>
+</div>

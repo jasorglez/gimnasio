@@ -1,0 +1,81 @@
+<div class="page-header">
+  <h1>Mis Reservaciones 📅</h1>
+  <p>Gestiona tus clases reservadas</p>
+</div>
+
+@if (mensaje()) {
+  <div class="alert alert-success">{{ mensaje() }}</div>
+}
+
+<div class="tabs-section">
+  <div class="tabs-label">
+    <h2>Próximas ({{ proximas().length }})</h2>
+  </div>
+
+  @if (proximas().length === 0) {
+    <div class="empty-state">
+      <div class="empty-icon">📅</div>
+      <h3>Sin reservaciones próximas</h3>
+      <p>Ve a la sección de clases y reserva tu lugar</p>
+    </div>
+  } @else {
+    <div class="reservaciones-list">
+      @for (r of proximas(); track r.id) {
+        @let clase = getClase(r.claseId);
+        @if (clase) {
+          <div class="reservacion-card">
+            <div class="color-bar" [style.background]="clase.color"></div>
+            <div class="card-emoji">{{ clase.emoji }}</div>
+            <div class="card-info">
+              <div class="card-top">
+                <h3>{{ clase.nombre }}</h3>
+                <span class="badge" [class]="getBadgeClass(r.estado)">{{ r.estado }}</span>
+              </div>
+              <p class="instructor">👨‍🏫 {{ clase.instructor }}</p>
+              <p class="horario">🕐 {{ clase.horaInicio }} – {{ clase.horaFin }}</p>
+              <p class="fecha">📆 {{ formatFecha(r.fecha) }}</p>
+            </div>
+            <div class="card-actions">
+              @if (r.estado !== 'cancelada') {
+                <button
+                  class="btn btn-danger btn-sm"
+                  (click)="cancelar(r)"
+                  [disabled]="cancelando() === r.id"
+                >
+                  {{ cancelando() === r.id ? 'Cancelando...' : '✕ Cancelar' }}
+                </button>
+              }
+            </div>
+          </div>
+        }
+      }
+    </div>
+  }
+</div>
+
+@if (pasadas().length > 0) {
+  <div class="tabs-section" style="margin-top: 32px">
+    <div class="tabs-label">
+      <h2>Historial ({{ pasadas().length }})</h2>
+    </div>
+    <div class="reservaciones-list pasadas">
+      @for (r of pasadas(); track r.id) {
+        @let clase = getClase(r.claseId);
+        @if (clase) {
+          <div class="reservacion-card pasada">
+            <div class="color-bar" [style.background]="clase.color"></div>
+            <div class="card-emoji">{{ clase.emoji }}</div>
+            <div class="card-info">
+              <div class="card-top">
+                <h3>{{ clase.nombre }}</h3>
+                <span class="badge" [class]="getBadgeClass(r.estado)">{{ r.estado }}</span>
+              </div>
+              <p class="horario">🕐 {{ clase.horaInicio }} – {{ clase.horaFin }}</p>
+              <p class="fecha">📆 {{ formatFecha(r.fecha) }}</p>
+            </div>
+          </div>
+        }
+      }
+    </div>
+  </div>
+}

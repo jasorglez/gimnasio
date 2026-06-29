@@ -1,0 +1,165 @@
+<div class="page-header">
+  <div>
+    <h1>Gestión de Clases 🏋️</h1>
+    <p>Administra el catálogo de clases deportivas</p>
+  </div>
+  <button class="btn btn-primary" (click)="abrirNueva()">+ Nueva clase</button>
+</div>
+
+@if (mensaje()) {
+  <div class="alert alert-success">{{ mensaje() }}</div>
+}
+
+<div class="clases-table card" style="padding:0; overflow:hidden">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Clase</th>
+        <th>Instructor</th>
+        <th>Días / Horario</th>
+        <th>Cupos</th>
+        <th>Reservaciones</th>
+        <th>Precio</th>
+        <th>Estado</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (clase of clases(); track clase.id) {
+        <tr>
+          <td>
+            <div class="clase-cell">
+              <div class="clase-dot" [style.background]="clase.color"></div>
+              <span class="clase-emoji-sm">{{ clase.emoji }}</span>
+              <div>
+                <strong>{{ clase.nombre }}</strong>
+                <span class="disciplina">{{ clase.disciplina }}</span>
+              </div>
+            </div>
+          </td>
+          <td>{{ clase.instructor }}</td>
+          <td>
+            <div style="font-size:13px">{{ formatDias(clase.diasSemana) }}</div>
+            <div style="font-size:12px; color:#6c63ff; font-weight:500">{{ clase.horaInicio }}–{{ clase.horaFin }}</div>
+          </td>
+          <td>
+            <span [class]="clase.cuposDisponibles === 0 ? 'text-danger' : clase.cuposDisponibles <= 3 ? 'text-warning' : 'text-success'">
+              {{ clase.cuposDisponibles }}/{{ clase.cuposTotal }}
+            </span>
+          </td>
+          <td>{{ contarReservaciones(clase.id) }}</td>
+          <td>${{ clase.precio }}</td>
+          <td>
+            <span class="badge" [class]="clase.activa ? 'badge-success' : 'badge-danger'">
+              {{ clase.activa ? 'Activa' : 'Inactiva' }}
+            </span>
+          </td>
+          <td>
+            <div class="actions">
+              <button class="btn btn-outline btn-sm" (click)="abrirEditar(clase)">✏️</button>
+              <button class="btn btn-sm" [class]="clase.activa ? 'btn-danger' : 'btn-success'" (click)="toggleActiva(clase)">
+                {{ clase.activa ? '⏸' : '▶' }}
+              </button>
+            </div>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>
+
+<!-- Modal -->
+@if (modalAbierto()) {
+  <div class="modal-overlay" (click)="cerrarModal()">
+    <div class="modal modal-lg" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>{{ editando() ? '✏️ Editar clase' : '+ Nueva clase' }}</h2>
+        <button class="btn btn-ghost btn-icon" (click)="cerrarModal()">✕</button>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Nombre *</label>
+          <input class="form-control" [ngModel]="form().nombre" (ngModelChange)="updateForm('nombre', $event)" placeholder="Ej: Yoga Matutino" />
+        </div>
+        <div class="form-group">
+          <label>Disciplina *</label>
+          <select class="form-control" [ngModel]="form().disciplina" (ngModelChange)="onDisciplinaChange($event)">
+            @for (d of disciplinas; track d.value) {
+              <option [value]="d.value">{{ d.emoji }} {{ d.label }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group" style="margin-top:14px">
+        <label>Descripción</label>
+        <textarea class="form-control" [ngModel]="form().descripcion" (ngModelChange)="updateForm('descripcion', $event)" rows="2" placeholder="Descripción de la clase..."></textarea>
+      </div>
+
+      <div class="form-row" style="margin-top:14px">
+        <div class="form-group">
+          <label>Instructor *</label>
+          <input class="form-control" [ngModel]="form().instructor" (ngModelChange)="updateForm('instructor', $event)" placeholder="Nombre del instructor" />
+        </div>
+        <div class="form-group">
+          <label>Precio por clase ($)</label>
+          <input class="form-control" type="number" [ngModel]="form().precio" (ngModelChange)="updateForm('precio', +$event)" />
+        </div>
+      </div>
+
+      <div class="form-row" style="margin-top:14px">
+        <div class="form-group">
+          <label>Hora inicio *</label>
+          <input class="form-control" type="time" [ngModel]="form().horaInicio" (ngModelChange)="updateForm('horaInicio', $event)" />
+        </div>
+        <div class="form-group">
+          <label>Hora fin *</label>
+          <input class="form-control" type="time" [ngModel]="form().horaFin" (ngModelChange)="updateForm('horaFin', $event)" />
+        </div>
+        <div class="form-group">
+          <label>Cupos totales</label>
+          <input class="form-control" type="number" min="1" max="50" [ngModel]="form().cuposTotal" (ngModelChange)="updateForm('cuposTotal', +$event)" />
+        </div>
+      </div>
+
+      <div class="form-group" style="margin-top:14px">
+        <label>Días de la semana *</label>
+        <div class="dias-picker">
+          @for (dia of dias; track dia) {
+            <button
+              class="dia-btn"
+              [class.selected]="form().diasSemana.includes(dia)"
+              (click)="toggleDia(dia)"
+              type="button"
+            >
+              {{ dia.slice(0,3) | titlecase }}
+            </button>
+          }
+        </div>
+      </div>
+
+      <div class="form-group" style="margin-top:14px">
+        <label>Color de identificación</label>
+        <div class="color-picker">
+          @for (color of colores; track color) {
+            <button
+              class="color-btn"
+              [style.background]="color"
+              [class.selected]="form().color === color"
+              (click)="updateForm('color', color)"
+              type="button"
+            ></button>
+          }
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-outline" (click)="cerrarModal()">Cancelar</button>
+        <button class="btn btn-primary" (click)="guardar()">
+          {{ editando() ? 'Guardar cambios' : 'Crear clase' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

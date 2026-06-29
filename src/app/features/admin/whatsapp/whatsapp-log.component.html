@@ -1,0 +1,37 @@
+<div class="page-header">
+  <div>
+    <h1>WhatsApp Notificaciones 💬</h1>
+    <p>Historial de mensajes enviados via WhatsApp API</p>
+  </div>
+  <div class="wa-status">
+    <span class="dot"></span>
+    <span>API Conectada (modo demo)</span>
+  </div>
+</div>
+
+@if (notificaciones().length === 0) {
+  <div class="empty-state">
+    <div class="empty-icon">💬</div>
+    <h3>Sin notificaciones enviadas</h3>
+    <p>Los mensajes aparecerán aquí cuando los usuarios realicen acciones</p>
+  </div>
+} @else {
+  <div class="wa-list">
+    @for (n of notificaciones(); track n.id) {
+      <div class="wa-card">
+        <div class="wa-icon">{{ getTipoIcon(n.tipo) }}</div>
+        <div class="wa-info">
+          <div class="wa-header">
+            <span class="badge" [class]="getTipoBadge(n.tipo)">{{ n.tipo }}</span>
+            <span class="telefono">📱 {{ n.telefono }}</span>
+            <span class="fecha">{{ formatFecha(n.fecha) }}</span>
+          </div>
+          <div class="wa-mensaje">{{ n.mensaje }}</div>
+          <div class="wa-status-row">
+            <span class="enviado">✅ Enviado</span>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+}

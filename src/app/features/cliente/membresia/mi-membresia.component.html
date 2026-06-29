@@ -1,0 +1,162 @@
+<div class="page-header">
+  <h1>Mi Membresía ⭐</h1>
+  <p>Gestiona tu plan y accede a todas las clases</p>
+</div>
+
+@if (mensajeExito()) {
+  <div class="alert alert-success">🎉 {{ mensajeExito() }}</div>
+}
+
+<!-- Membresía actual -->
+@if (membresia()) {
+  <div class="card membresia-activa">
+    <div class="membresia-top">
+      <div>
+        <div class="badge badge-success">Membresía Activa</div>
+        <h2>{{ membresia()!.plan.nombre }}</h2>
+        <p class="precio">${{ membresia()!.plan.precio }}</p>
+      </div>
+      <div class="countdown">
+        <strong>{{ diasRestantes() }}</strong>
+        <span>días restantes</span>
+      </div>
+    </div>
+    <div class="membresia-details">
+      <div class="detail"><span>Inicio</span><strong>{{ formatFecha(membresia()!.fechaInicio) }}</strong></div>
+      <div class="detail"><span>Vencimiento</span><strong>{{ formatFecha(membresia()!.fechaVencimiento) }}</strong></div>
+      <div class="detail"><span>Clases usadas</span><strong>{{ membresia()!.clasesUsadas }}</strong></div>
+      <div class="detail">
+        <span>Clases disponibles</span>
+        <strong>{{ membresia()!.plan.clasesPorMes === 'ilimitadas' ? '∞ Ilimitadas' : membresia()!.plan.clasesPorMes + '/mes' }}</strong>
+      </div>
+    </div>
+    <div class="beneficios">
+      <h4>Beneficios incluidos:</h4>
+      <ul>
+        @for (b of membresia()!.plan.beneficios; track b) {
+          <li>✅ {{ b }}</li>
+        }
+      </ul>
+    </div>
+  </div>
+}
+
+<!-- Planes disponibles -->
+<div class="section-title">
+  <h2>{{ membresia() ? 'Renovar o cambiar plan' : 'Elige tu plan' }}</h2>
+</div>
+
+<div class="planes-grid">
+  @for (plan of planes; track plan.id) {
+    <div class="plan-card" [class.popular]="plan.popular" [class.selected]="planSeleccionado()?.id === plan.id">
+      @if (plan.popular) {
+        <div class="popular-badge">🔥 Más popular</div>
+      }
+      <div class="plan-header">
+        <h3>{{ plan.nombre }}</h3>
+        <p class="plan-desc">{{ plan.descripcion }}</p>
+        <div class="plan-precio">
+          <strong>${{ plan.precio }}</strong>
+          <span>/ {{ plan.duracionDias }} días</span>
+        </div>
+        <div class="precio-mensual">≈ ${{ precioMensual(plan) }}/mes</div>
+      </div>
+      <ul class="plan-beneficios">
+        @for (b of plan.beneficios; track b) {
+          <li>✅ {{ b }}</li>
+        }
+      </ul>
+      <button class="btn btn-primary w-100" (click)="seleccionarPlan(plan)">
+        Contratar →
+      </button>
+    </div>
+  }
+</div>
+
+<!-- Modal de pago -->
+@if (planSeleccionado()) {
+  <div class="modal-overlay" (click)="cancelarSeleccion()">
+    <div class="modal modal-lg" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Contratar {{ planSeleccionado()!.nombre }}</h2>
+        <button class="btn btn-ghost btn-icon" (click)="cancelarSeleccion()">✕</button>
+      </div>
+
+      <div class="pago-resumen">
+        <div class="resumen-row">
+          <span>Plan</span><strong>{{ planSeleccionado()!.nombre }}</strong>
+        </div>
+        <div class="resumen-row">
+          <span>Duración</span><strong>{{ planSeleccionado()!.duracionDias }} días</strong>
+        </div>
+        <div class="resumen-row total">
+          <span>Total a pagar</span><strong>${{ planSeleccionado()!.precio }} MXN</strong>
+        </div>
+      </div>
+
+      <div class="form-group" style="margin-top:20px">
+        <label>Método de pago</label>
+        <select class="form-control" [ngModel]="metodoPago()" (ngModelChange)="metodoPago.set($event)">
+          @for (m of metodos; track m.value) {
+            <option [value]="m.value">{{ m.label }}</option>
+          }
+        </select>
+      </div>
+
+      @if (metodoPago() === 'transferencia') {
+        <div class="info-transferencia">
+          <h4>Datos para transferencia:</h4>
+          <p>Banco: BBVA · Cuenta: 0123456789 · CLABE: 012345678901234567</p>
+          <p>Concepto: {{ usuario()?.nombre }} {{ usuario()?.apellido }} - {{ planSeleccionado()!.nombre }}</p>
+        </div>
+      }
+
+      <div class="form-group" style="margin-top:16px">
+        <label>Comprobante de pago (opcional)</label>
+        <div class="upload-zone" (click)="fileInput.click()">
+          @if (nombreArchivo()) {
+            <span class="upload-icon">✅</span>
+            <h4>{{ nombreArchivo() }}</h4>
+            <p>Archivo cargado correctamente</p>
+          } @else {
+            <span class="upload-icon">📎</span>
+            <h4>Adjuntar comprobante</h4>
+            <p>Haz clic para subir imagen o PDF</p>
+          }
+        </div>
+        <input #fileInput type="file" accept="image/*,.pdf" style="display:none" (change)="onArchivo($event)" />
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-outline" (click)="cancelarSeleccion()">Cancelar</button>
+        <button class="btn btn-primary" (click)="contratar()" [disabled]="procesando()">
+          @if (procesando()) { Procesando... } @else { Confirmar compra }
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Historial -->
+@if (historial().length > 0) {
+  <div style="margin-top: 40px">
+    <h2 style="font-size:18px; font-weight:700; margin-bottom:16px">Historial de membresías</h2>
+    <div class="card" style="padding:0; overflow:hidden">
+      <table class="table">
+        <thead>
+          <tr><th>Plan</th><th>Inicio</th><th>Vencimiento</th><th>Estado</th></tr>
+        </thead>
+        <tbody>
+          @for (m of historial(); track m.id) {
+            <tr>
+              <td><strong>{{ m.plan.nombre }}</strong></td>
+              <td>{{ formatFecha(m.fechaInicio) }}</td>
+              <td>{{ formatFecha(m.fechaVencimiento) }}</td>
+              <td><span class="badge" [class]="getEstadoBadge(m.estado)">{{ m.estado }}</span></td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+}

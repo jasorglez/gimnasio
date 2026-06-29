@@ -1,0 +1,79 @@
+<div class="auth-page">
+  <div class="auth-left">
+    <div class="brand">
+      <span class="logo-icon">💪</span>
+      <span class="logo-text">ClasesDeportivas</span>
+    </div>
+    <div class="hero-content">
+      <h1>Únete a la<br><span>comunidad</span></h1>
+      <p>Más de 500 personas ya transformaron su vida con nosotros. ¡Es tu turno!</p>
+      <ul class="benefits-list">
+        <li>✅ Acceso a 8 disciplinas deportivas</li>
+        <li>✅ Reserva clases en segundos</li>
+        <li>✅ Control de tu membresía</li>
+        <li>✅ Notificaciones por WhatsApp</li>
+        <li>✅ Recibos digitales</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="auth-right">
+    <div class="auth-box">
+      <h2>Crear cuenta</h2>
+      <p class="subtitle">Empieza gratis hoy mismo 🚀</p>
+
+      @if (error()) {
+        <div class="alert alert-danger">{{ error() }}</div>
+      }
+
+      <div class="row-2">
+        <div class="form-group">
+          <label>Nombre</label>
+          <input class="form-control" placeholder="Juan" [ngModel]="nombre()" (ngModelChange)="nombre.set($event)" />
+        </div>
+        <div class="form-group">
+          <label>Apellido</label>
+          <input class="form-control" placeholder="García" [ngModel]="apellido()" (ngModelChange)="apellido.set($event)" />
+        </div>
+      </div>
+
+      <div class="form-group" style="margin-top:14px">
+        <label>Correo electrónico</label>
+        <input class="form-control" type="email" placeholder="tu@email.com" [ngModel]="email()" (ngModelChange)="email.set($event)" />
+      </div>
+
+      <div class="form-group" style="margin-top:14px">
+        <label>Teléfono (WhatsApp)</label>
+        <input class="form-control" type="tel" placeholder="5551234567" [ngModel]="telefono()" (ngModelChange)="telefono.set($event)" />
+      </div>
+
+      <div class="row-2" style="margin-top:14px">
+        <div class="form-group">
+          <label>Contraseña</label>
+          <input class="form-control" [type]="mostrarPassword() ? 'text' : 'password'" placeholder="••••••" [ngModel]="password()" (ngModelChange)="password.set($event)" />
+        </div>
+        <div class="form-group">
+          <label>Confirmar</label>
+          <input class="form-control" [type]="mostrarPassword() ? 'text' : 'password'" placeholder="••••••" [ngModel]="confirmPassword()" (ngModelChange)="confirmPassword.set($event)" />
+        </div>
+      </div>
+
+      <label class="show-pass" style="margin-top:10px">
+        <input type="checkbox" [checked]="mostrarPassword()" (change)="mostrarPassword.update(v=>!v)" />
+        Mostrar contraseña
+      </label>
+
+      <button class="btn btn-primary w-100 register-btn" (click)="registrar()" [disabled]="loading()">
+        @if (loading()) {
+          <span class="spinner-inline"></span> Creando cuenta...
+        } @else {
+          Crear cuenta gratis →
+        }
+      </button>
+
+      <p class="login-link">
+        ¿Ya tienes cuenta? <a routerLink="/login">Inicia sesión</a>
+      </p>
+    </div>
+  </div>
+</div>

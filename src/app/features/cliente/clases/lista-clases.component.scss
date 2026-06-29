@@ -1,0 +1,131 @@
+.filtros {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+
+  .search { flex: 1; min-width: 200px; }
+  select { width: 180px; }
+}
+
+.clases-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.clase-card {
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  border: 1px solid #e2e8f0;
+  transition: transform 0.2s, box-shadow 0.2s;
+  display: flex;
+  flex-direction: column;
+
+  &:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.12); }
+  &.sin-cupos { opacity: 0.75; }
+}
+
+.clase-header {
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+
+  .clase-emoji { font-size: 36px; }
+
+  .header-info {
+    h3 { color: white; font-size: 17px; font-weight: 700; }
+
+    .disciplina-tag {
+      display: inline-block;
+      background: rgba(255,255,255,0.2);
+      color: white;
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 100px;
+      margin-top: 4px;
+      text-transform: capitalize;
+    }
+  }
+}
+
+.clase-body {
+  flex: 1;
+  padding: 16px;
+
+  .descripcion {
+    font-size: 13px;
+    color: #718096;
+    line-height: 1.5;
+    margin-bottom: 14px;
+  }
+}
+
+.meta {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 14px;
+
+  .meta-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #2d3748;
+
+    .meta-icon { font-size: 14px; width: 20px; text-align: center; }
+  }
+}
+
+.cupos-row {
+  margin-bottom: 8px;
+}
+
+.cupos-badge {
+  font-size: 12px;
+  font-weight: 600;
+
+  &.ok { color: #00d4aa; }
+  &.low { color: #ffb800; }
+  &.full { color: #ff4757; }
+}
+
+.cupos-bar {
+  height: 4px;
+  background: #e2e8f0;
+  border-radius: 100px;
+  overflow: hidden;
+
+  .cupos-fill {
+    height: 100%;
+    border-radius: 100px;
+    transition: width 0.3s;
+  }
+}
+
+.clase-footer {
+  padding: 14px 16px;
+  border-top: 1px solid #f0f0f0;
+}
+
+/* Modal */
+.modal-info {
+  .modal-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    background: #f7f8fc;
+    border-radius: 10px;
+    padding: 14px;
+    font-size: 14px;
+    color: #2d3748;
+  }
+}
+
+.cupos-ok { color: #00d4aa; font-weight: 600; }
+.cupos-low { color: #ffb800; font-weight: 600; }
+.cupos-full { color: #ff4757; font-weight: 600; }
