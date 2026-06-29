@@ -24,7 +24,7 @@ COPY --from=build /app/dist/clases-deportivas/browser /usr/share/nginx/html
 
 EXPOSE 80
 
-HEALTHCHECK --interval=30s --timeout=3s --start_period=10s --retries=3 \
+HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
   CMD curl -f http://localhost/ || exit 1
 
 CMD ["nginx", "-g", "daemon off;"]
